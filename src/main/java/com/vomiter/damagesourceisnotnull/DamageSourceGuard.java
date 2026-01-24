@@ -21,14 +21,17 @@ public final class DamageSourceGuard {
      * @return 保證非 null 的 DamageSource（若原本是 null 則 fallback）
      */
     public static DamageSource guard(LivingEntity self, String phase, DamageSource source) {
-        if (self.level().isClientSide) return source;
-
         if (source != null) return source;
 
-        logNullSource(self, phase);
+        // client 端也要補上 fallback，否則渲染/同步可能怪
+        DamageSource fallback = self.level().damageSources().generic();
 
-        // 最穩 fallback：generic（不依賴 attacker/間接來源）
-        return self.level().damageSources().generic();
+        // 只有 server 端才記錄兇手與堆疊
+        if (!self.level().isClientSide) {
+            logNullSource(self, phase);
+        }
+
+        return fallback;
     }
 
     private static void logNullSource(LivingEntity self, String phase) {
@@ -43,7 +46,7 @@ public final class DamageSourceGuard {
 
         String selfInfo;
         try {
-            selfInfo = self.getType().toString()
+            selfInfo = self.getType()
                     + " pos=" + self.blockPosition()
                     + " dim=" + self.level().dimension().location();
         } catch (Throwable t) {
@@ -67,7 +70,7 @@ public final class DamageSourceGuard {
             if (cn.startsWith("sun.")) continue;
 
             // 過濾自己（避免第一個命中是 guard 本身）
-            if (cn.startsWith("com.vomiter.damagesourceguard.")) continue;
+            if (cn.startsWith("com.vomiter.damagesourceisnotnull.DamageSourceGuard")) continue;
 
             return cn + "#" + e.getMethodName() + ":" + e.getLineNumber();
         }
