@@ -21,7 +21,6 @@ public final class DamageSourceGuard {
      * @return 保證非 null 的 DamageSource（若原本是 null 則 fallback）
      */
     public static DamageSource guard(LivingEntity self, String phase, DamageSource source) {
-        // 你想只抓 dedicated server：通常這樣就夠
         if (self.level().isClientSide) return source;
 
         if (source != null) return source;
@@ -51,7 +50,6 @@ public final class DamageSourceGuard {
             selfInfo = "<unprintable-entity>";
         }
 
-        // 你要 WARN 或 ERROR：我建議直接 ERROR（因為它真的會造成其他模組炸）
         LOGGER.error("[DamageSourceGuard] null DamageSource in {}. entity={} suspect={}", phase, selfInfo, suspect);
         LOGGER.error("[DamageSourceGuard] stacktrace:", new RuntimeException("null DamageSource stack"));
     }
