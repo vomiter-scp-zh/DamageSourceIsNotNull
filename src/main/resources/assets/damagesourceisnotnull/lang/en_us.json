@@ -1,0 +1,13 @@
+{
+  "itemGroup.damagesourceisnotnull": "Example Mod Tab",
+  "block.damagesourceisnotnull.example_block": "Example Block",
+  "item.damagesourceisnotnull.example_item": "Example Item",
+
+  "damagesourceisnotnull.configuration.title": "DamageSourceIsNotNull Configs",
+  "damagesourceisnotnull.configuration.section.damagesourceisnotnull.common.toml": "DamageSourceIsNotNull Configs",
+  "damagesourceisnotnull.configuration.section.damagesourceisnotnull.common.toml.title": "DamageSourceIsNotNull Configs",
+  "damagesourceisnotnull.configuration.items": "Item List",
+  "damagesourceisnotnull.configuration.logDirtBlock": "Log Dirt Block",
+  "damagesourceisnotnull.configuration.magicNumberIntroduction": "Magic Number Text",
+  "damagesourceisnotnull.configuration.magicNumber": "Magic Number"
+}
