@@ -10,13 +10,21 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.animal.Pig;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import net.minecraftforge.event.RegisterCommandsEvent;
+import net.minecraftforge.event.entity.living.LivingEvent;
 
 import java.util.Comparator;
 import java.util.List;
 
 public final class NullDamageSourceCommand {
     private NullDamageSourceCommand() {}
+    private static final String MAGIC_STRING = "to_die";
+
+    public static void onLiving(LivingEvent.LivingTickEvent event){
+        var living = event.getEntity();
+        if(living.getPersistentData().getBoolean(MAGIC_STRING)) living.die(null);
+        living.getPersistentData().remove(MAGIC_STRING);
+    }
 
     public static void register(RegisterCommandsEvent event) {
         CommandDispatcher<CommandSourceStack> dispatcher = event.getDispatcher();
@@ -25,13 +33,18 @@ public final class NullDamageSourceCommand {
                 Commands.literal("dsnnull")
                         .then(Commands.literal("mob")
                                 .then(Commands.literal("hurt").executes(ctx -> run(ctx.getSource(), Mode.HURT)))
-                                .then(Commands.literal("kill").executes(ctx -> run(ctx.getSource(), Mode.KILL))))
+                                .then(Commands.literal("kill").executes(ctx -> run(ctx.getSource(), Mode.KILL)))
+                                .then(Commands.literal("hard_kill").executes(ctx -> run(ctx.getSource(), Mode.HARD_KILL)))
+
+        )
+
+
         );
     }
 
     // ===== core =====
 
-    private enum Mode { HURT, KILL }
+    private enum Mode { HURT, KILL, HARD_KILL }
 
     private static int run(CommandSourceStack src, Mode mode) {
         if (!(src.getEntity() instanceof ServerPlayer player)) return 0;
@@ -46,8 +59,10 @@ public final class NullDamageSourceCommand {
 
         if (mode == Mode.HURT) {
             target.hurt(null, 4.0F); // 刻意傳 null
-        } else {
+        } else if(mode == Mode.KILL) {
             target.die(null); // 刻意傳 null
+        } else {
+            target.getPersistentData().putBoolean("to_die", true);
         }
 
         return 1;
