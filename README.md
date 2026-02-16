@@ -1,6 +1,6 @@
 # Damage Source Guard
 
-**Damage Source Guard** is a small stability-focused utility mod for NeoForge 1.21.1.  
+**Damage Source Guard** is a small stability-focused utility mod for Forge 1.20.1 and NeoForge 1.21.1.  
 It prevents server crashes caused by **invalid or `null` `DamageSource` values** being passed into entity damage or death logic by other mods.
 
 Instead of letting the game crash, this mod applies a safe fallback `DamageSource` and logs detailed warnings to help identify the real cause.
@@ -86,7 +86,7 @@ It is especially helpful for server operators who cannot easily reproduce rare c
 
 ## ⚙ Compatibility
 
-- ✅ NeoForge **1.21.1**
+- ✅ NeoForge **1.21.1** and Forge **1.20.1**
 - ❗ Not needed on the client, but harmless if installed
 - Designed to be as minimal and low-risk as possible
 
