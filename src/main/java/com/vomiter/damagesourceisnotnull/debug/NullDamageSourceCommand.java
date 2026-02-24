@@ -49,7 +49,7 @@ public final class NullDamageSourceCommand {
     private static int run(CommandSourceStack src, Mode mode) {
         if (!(src.getEntity() instanceof ServerPlayer player)) return 0;
 
-        ServerLevel level = player.serverLevel();
+        ServerLevel level = player.getLevel();
 
         LivingEntity target = findNearestLivingEntity(player, 16.0);
 
@@ -71,7 +71,7 @@ public final class NullDamageSourceCommand {
     // ===== helpers =====
 
     private static LivingEntity findNearestLivingEntity(ServerPlayer player, double radius) {
-        ServerLevel level = player.serverLevel();
+        ServerLevel level = player.getLevel();
         Vec3 center = player.position();
 
         AABB box = new AABB(

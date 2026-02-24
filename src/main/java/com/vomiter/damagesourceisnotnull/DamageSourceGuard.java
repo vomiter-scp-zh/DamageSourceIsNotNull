@@ -24,10 +24,10 @@ public final class DamageSourceGuard {
         if (source != null) return source;
 
         // client 端也要補上 fallback，否則渲染/同步可能怪
-        DamageSource fallback = self.level().damageSources().generic();
+        DamageSource fallback = DamageSource.GENERIC;
 
         // 只有 server 端才記錄兇手與堆疊
-        if (!self.level().isClientSide) {
+        if (!self.level.isClientSide) {
             logNullSource(self, phase);
         }
 
@@ -48,7 +48,7 @@ public final class DamageSourceGuard {
         try {
             selfInfo = self.getType()
                     + " pos=" + self.blockPosition()
-                    + " dim=" + self.level().dimension().location();
+                    + " dim=" + self.level.dimension().location();
         } catch (Throwable t) {
             selfInfo = "<unprintable-entity>";
         }
