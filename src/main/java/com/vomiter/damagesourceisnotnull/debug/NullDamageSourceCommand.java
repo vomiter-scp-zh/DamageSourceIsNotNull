@@ -8,6 +8,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.animal.Pig;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.RegisterCommandsEvent;
@@ -22,9 +23,11 @@ public final class NullDamageSourceCommand {
 
     public static void onLiving(LivingEvent.LivingTickEvent event){
         var living = event.getEntity();
-        if(living.getPersistentData().getBoolean(MAGIC_STRING)) living.die(null);
-        living.getPersistentData().remove(MAGIC_STRING);
-        living.discard();
+        if(living.getPersistentData().getBoolean(MAGIC_STRING)) {
+            living.die(null);
+            living.getPersistentData().remove(MAGIC_STRING);
+            living.discard();
+        }
     }
 
     public static void register(RegisterCommandsEvent event) {
@@ -62,7 +65,7 @@ public final class NullDamageSourceCommand {
             target.hurt(null, 4.0F); // 刻意傳 null
         } else if(mode == Mode.KILL) {
             target.die(null); // 刻意傳 null
-            target.discard();
+            if(!(target instanceof Player)) target.discard();
         } else {
             target.getPersistentData().putBoolean("to_die", true);
         }
