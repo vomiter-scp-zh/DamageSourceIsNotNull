@@ -53,7 +53,13 @@ public final class DamageSourceGuard {
             selfInfo = "<unprintable-entity>";
         }
 
-        LOGGER.error("[DamageSourceGuard] null DamageSource in {}. entity={} suspect={}", phase, selfInfo, suspect);
+        String suspectClass = suspect.split("#", 2)[0];
+        String mod = ModIdResolver.resolveModFromClassName(suspectClass);
+
+        LOGGER.error("[DamageSourceGuard] null DamageSource in {}", phase);
+        LOGGER.error("[DamageSourceGuard] entity={}", selfInfo);
+        LOGGER.error("[DamageSourceGuard] suspect={}", suspect);
+        LOGGER.error("[DamageSourceGuard] suspectMod={}", mod);
         LOGGER.error("[DamageSourceGuard] stacktrace:", new RuntimeException("null DamageSource stack"));
     }
 
@@ -65,6 +71,7 @@ public final class DamageSourceGuard {
             // 過濾常見框架/底層
             if (cn.startsWith("net.minecraft.")) continue;
             if (cn.startsWith("net.neoforged.")) continue;
+            if (cn.startsWith("net.minecraftforge."))
             if (cn.startsWith("org.spongepowered.")) continue;
             if (cn.startsWith("java.")) continue;
             if (cn.startsWith("sun.")) continue;

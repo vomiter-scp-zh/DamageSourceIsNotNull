@@ -30,6 +30,7 @@ minecraft {
 
 apply from: 'gradle/runs.gradle'
 apply from: 'gradle/publishing-local.gradle'
+apply from: 'gradle/mixin.gradle'
 
 /*
 repositories {
