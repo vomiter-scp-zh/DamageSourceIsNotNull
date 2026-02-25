@@ -71,7 +71,7 @@ public final class DamageSourceGuard {
             // 過濾常見框架/底層
             if (cn.startsWith("net.minecraft.")) continue;
             if (cn.startsWith("net.neoforged.")) continue;
-            if (cn.startsWith("net.minecraftforge."))
+            if (cn.startsWith("net.minecraftforge.")) continue;
             if (cn.startsWith("org.spongepowered.")) continue;
             if (cn.startsWith("java.")) continue;
             if (cn.startsWith("sun.")) continue;
