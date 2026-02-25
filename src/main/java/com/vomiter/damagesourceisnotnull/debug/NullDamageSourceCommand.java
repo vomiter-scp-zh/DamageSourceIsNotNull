@@ -11,28 +11,15 @@ import net.minecraft.world.entity.animal.Pig;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.event.RegisterCommandsEvent;
-import net.minecraftforge.event.entity.living.LivingEvent;
 
 import java.util.Comparator;
 import java.util.List;
 
 public final class NullDamageSourceCommand {
     private NullDamageSourceCommand() {}
-    private static final String MAGIC_STRING = "to_die";
+    public static LivingEntity TO_DIE;
 
-    public static void onLiving(LivingEvent.LivingTickEvent event){
-        var living = event.getEntity();
-        if(living.getPersistentData().getBoolean(MAGIC_STRING)) {
-            living.die(null);
-            living.getPersistentData().remove(MAGIC_STRING);
-            living.discard();
-        }
-    }
-
-    public static void register(RegisterCommandsEvent event) {
-        CommandDispatcher<CommandSourceStack> dispatcher = event.getDispatcher();
-
+    public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(
                 Commands.literal("dsnnull")
                         .then(Commands.literal("mob")
@@ -67,7 +54,7 @@ public final class NullDamageSourceCommand {
             target.die(null); // 刻意傳 null
             if(!(target instanceof Player)) target.discard();
         } else {
-            target.getPersistentData().putBoolean("to_die", true);
+            TO_DIE = target;
         }
 
         return 1;

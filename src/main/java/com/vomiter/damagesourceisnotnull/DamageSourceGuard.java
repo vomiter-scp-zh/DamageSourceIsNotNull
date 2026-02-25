@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public final class DamageSourceGuard {
 
-    private static final Logger LOGGER = LogUtils.getLogger();
+    private static final Logger LOGGER = DSNNULLFabric.LOGGER;
     private static final ConcurrentHashMap<String, Long> LAST_LOG_MS = new ConcurrentHashMap<>();
 
     private DamageSourceGuard() {}
@@ -27,7 +27,7 @@ public final class DamageSourceGuard {
         DamageSource fallback = self.level().damageSources().generic();
 
         // 只有 server 端才記錄兇手與堆疊
-        if (!self.level().isClientSide) {
+        if (!self.level().isClientSide()) {
             logNullSource(self, phase);
         }
 
@@ -47,7 +47,7 @@ public final class DamageSourceGuard {
         String selfInfo;
         try {
             selfInfo = self.getType()
-                    + " pos=" + self.blockPosition()
+                    + " pos=" + self.getOnPos()
                     + " dim=" + self.level().dimension().location();
         } catch (Throwable t) {
             selfInfo = "<unprintable-entity>";
@@ -71,7 +71,8 @@ public final class DamageSourceGuard {
             // 過濾常見框架/底層
             if (cn.startsWith("net.minecraft.")) continue;
             if (cn.startsWith("net.neoforged.")) continue;
-            if (cn.startsWith("net.minecraftforge."))
+            if (cn.startsWith("net.minecraftforge.")) continue;
+            if (cn.startsWith("net.fabricmc")) continue;
             if (cn.startsWith("org.spongepowered.")) continue;
             if (cn.startsWith("java.")) continue;
             if (cn.startsWith("sun.")) continue;
