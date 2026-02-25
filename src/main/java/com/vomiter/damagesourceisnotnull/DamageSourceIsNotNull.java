@@ -3,8 +3,8 @@ package com.vomiter.damagesourceisnotnull;
 import com.mojang.logging.LogUtils;
 import com.vomiter.damagesourceisnotnull.debug.NullDamageSourceCommand;
 import net.minecraftforge.fml.IExtensionPoint;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.network.NetworkConstants;
 import org.slf4j.Logger;
 
@@ -18,9 +18,11 @@ public class DamageSourceIsNotNull {
     // Directly reference a slf4j logger
     public static final Logger LOGGER = LogUtils.getLogger();
 
-    public DamageSourceIsNotNull(FMLJavaModLoadingContext context) {
+    public DamageSourceIsNotNull() {
         EVENT_BUS.addListener(NullDamageSourceCommand::register);
         EVENT_BUS.addListener(NullDamageSourceCommand::onLiving);
+
+        /*
         context.registerExtensionPoint(
                 IExtensionPoint.DisplayTest.class,
                 () -> new IExtensionPoint.DisplayTest(
@@ -29,5 +31,13 @@ public class DamageSourceIsNotNull {
                 )
         );
 
+         */
+        ModLoadingContext.get().registerExtensionPoint(
+                IExtensionPoint.DisplayTest.class,
+                () -> new IExtensionPoint.DisplayTest(
+                        () -> NetworkConstants.IGNORESERVERONLY,
+                        (remoteVersionString, isNetwork) -> true
+                )
+        );
     }
 }

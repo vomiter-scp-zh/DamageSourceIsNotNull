@@ -12,7 +12,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.RegisterCommandsEvent;
-import net.minecraftforge.event.entity.living.LivingEvent;
+import net.minecraftforge.event.TickEvent;
 
 import java.util.Comparator;
 import java.util.List;
@@ -20,14 +20,13 @@ import java.util.List;
 public final class NullDamageSourceCommand {
     private NullDamageSourceCommand() {}
     private static final String MAGIC_STRING = "to_die";
+    private static LivingEntity TO_DIE;
 
-    public static void onLiving(LivingEvent.LivingTickEvent event){
-        var living = event.getEntity();
-        if(living.getPersistentData().getBoolean(MAGIC_STRING)) {
-            living.die(null);
-            living.getPersistentData().remove(MAGIC_STRING);
-            living.discard();
-        }
+    public static void onLiving(TickEvent.WorldTickEvent event){
+        if(event.side.isClient()) return;
+        if(TO_DIE == null) return;
+        TO_DIE.die(null);
+        TO_DIE.discard();
     }
 
     public static void register(RegisterCommandsEvent event) {
@@ -68,6 +67,7 @@ public final class NullDamageSourceCommand {
             if(!(target instanceof Player)) target.discard();
         } else {
             target.getPersistentData().putBoolean("to_die", true);
+            TO_DIE = target;
         }
 
         return 1;
