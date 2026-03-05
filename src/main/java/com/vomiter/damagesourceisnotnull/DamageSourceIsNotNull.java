@@ -2,6 +2,7 @@ package com.vomiter.damagesourceisnotnull;
 
 import com.mojang.logging.LogUtils;
 import com.vomiter.damagesourceisnotnull.debug.NullDamageSourceCommand;
+import com.vomiter.damagesourceisnotnull.debug.NullDamageTestAll;
 import net.minecraftforge.fml.IExtensionPoint;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -21,6 +22,7 @@ public class DamageSourceIsNotNull {
     public DamageSourceIsNotNull(FMLJavaModLoadingContext context) {
         EVENT_BUS.addListener(NullDamageSourceCommand::register);
         EVENT_BUS.addListener(NullDamageSourceCommand::onLiving);
+        EVENT_BUS.addListener(NullDamageTestAll::onServerTick);
         context.registerExtensionPoint(
                 IExtensionPoint.DisplayTest.class,
                 () -> new IExtensionPoint.DisplayTest(

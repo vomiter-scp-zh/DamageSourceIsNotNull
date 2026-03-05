@@ -1,6 +1,14 @@
+//mixin.gradle
 mixin {
     add    sourceSets.main, "${mod_id}.mixins.refmap.json"
     config "${mod_id}.mixins.json"
     debug.verbose = true
     debug.export  = true
+}
+tasks.named('processResources', ProcessResources).configure {
+    // 把 annotation processor 產生的 refmap 從 tmp 搬進 resources
+    from("$buildDir/tmp/compileJava") {
+        include "compileJava-refmap.json"
+        rename { "${mod_id}.mixins.refmap.json" }
+    }
 }

@@ -1,6 +1,10 @@
 package com.vomiter.damagesourceisnotnull;
 
 import com.mojang.logging.LogUtils;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import org.slf4j.Logger;
@@ -11,6 +15,16 @@ public final class DamageSourceGuard {
 
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final ConcurrentHashMap<String, Long> LAST_LOG_MS = new ConcurrentHashMap<>();
+    private static volatile boolean INGAME_NOTIFY = false;
+    private static final ConcurrentHashMap<String, Long> LAST_NOTIFY_MS = new ConcurrentHashMap<>();
+
+    public static boolean isIngameNotifyEnabled() {
+        return INGAME_NOTIFY;
+    }
+
+    public static void setIngameNotifyEnabled(boolean enabled) {
+        INGAME_NOTIFY = enabled;
+    }
 
     private DamageSourceGuard() {}
 
@@ -61,6 +75,53 @@ public final class DamageSourceGuard {
         LOGGER.error("[DamageSourceGuard] suspect={}", suspect);
         LOGGER.error("[DamageSourceGuard] suspectMod={}", mod);
         LOGGER.error("[DamageSourceGuard] stacktrace:", new RuntimeException("null DamageSource stack"));
+
+        if (INGAME_NOTIFY) {
+            notifyIngame(self, phase, suspect, mod);
+        }
+    }
+
+    private static void notifyIngame(LivingEntity self, String phase, String suspect, String mod) {
+        if (self.level().isClientSide) return;
+
+        MinecraftServer server = self.level().getServer();
+        if (server == null) return;
+
+        // 節流：同一個 suspectMod + phase 5 秒內只通知一次
+        String key = mod + "|" + phase;
+        long now = System.currentTimeMillis();
+        Long prev = LAST_NOTIFY_MS.put(key, now);
+        long throttleMs = 5000L;
+        if (prev != null && (now - prev) < throttleMs) return;
+
+        String entityName;
+        try {
+            entityName = self.getName().getString();
+        } catch (Throwable t) {
+            entityName = "<entity>";
+        }
+
+        Component msg1 = Component.literal("[DSNNULL] A null DamageSource was intercepted to prevent hard crash.")
+                .withStyle(ChatFormatting.GOLD);
+        Component msg2 = Component.literal("[DSNNULL] phase=" + phase + ", entity=" + entityName + ", suspectMod=" + mod)
+                .withStyle(ChatFormatting.YELLOW);
+        Component msg3 = Component.literal("[DSNNULL] Please search for DamageSourceGuard in the latest log for more detail.")
+                .withStyle(ChatFormatting.GRAY);
+
+        // 通知所有 OP/管理員（避免一般玩家被洗）
+        for (ServerPlayer p : server.getPlayerList().getPlayers()) {
+            if (!p.hasPermissions(2)) continue;
+            p.sendSystemMessage(msg1);
+            p.sendSystemMessage(msg2);
+            p.sendSystemMessage(msg3);
+        }
+
+        // 若剛好是玩家自己觸發，也可以額外只通知他（可選）
+        if (self instanceof ServerPlayer sp && !sp.hasPermissions(2)) {
+            sp.sendSystemMessage(msg1);
+            sp.sendSystemMessage(msg2);
+            sp.sendSystemMessage(msg3);
+        }
     }
 
     private static String findSuspect() {

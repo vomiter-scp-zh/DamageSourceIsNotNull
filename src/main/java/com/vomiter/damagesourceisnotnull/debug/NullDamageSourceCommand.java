@@ -1,14 +1,16 @@
 package com.vomiter.damagesourceisnotnull.debug;
 
 import com.mojang.brigadier.CommandDispatcher;
+import com.vomiter.damagesourceisnotnull.DamageSourceGuard;
+import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.animal.Pig;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.RegisterCommandsEvent;
@@ -19,14 +21,26 @@ import java.util.List;
 
 public final class NullDamageSourceCommand {
     private NullDamageSourceCommand() {}
-    private static final String MAGIC_STRING = "to_die";
 
+    private static LivingEntity THE_LIVING_TO_DIE;
+    private static boolean HARD_KILL_SWITCH = false;
+    private static LivingEntity THE_LIVING_TO_HURT;
+    private static boolean HARD_HURT_SWITCH = false;
+
+    // 你原本的 tick-scheduled hurt/kill
     public static void onLiving(LivingEvent.LivingTickEvent event){
         var living = event.getEntity();
-        if(living.getPersistentData().getBoolean(MAGIC_STRING)) {
-            living.die(null);
-            living.getPersistentData().remove(MAGIC_STRING);
-            living.discard();
+        if (HARD_KILL_SWITCH) {
+            if (living.equals(THE_LIVING_TO_DIE)) {
+                living.die(null);
+                living.discard();
+                HARD_KILL_SWITCH = false;
+            }
+        } else if (HARD_HURT_SWITCH) {
+            if (living.equals(THE_LIVING_TO_HURT)) {
+                living.hurt(null, 1);
+                HARD_HURT_SWITCH = false;
+            }
         }
     }
 
@@ -35,20 +49,27 @@ public final class NullDamageSourceCommand {
 
         dispatcher.register(
                 Commands.literal("dsnnull")
-                        .then(Commands.literal("mob")
+                        .then(Commands.literal("debug")
                                 .then(Commands.literal("hurt").executes(ctx -> run(ctx.getSource(), Mode.HURT)))
                                 .then(Commands.literal("kill").executes(ctx -> run(ctx.getSource(), Mode.KILL)))
-                                .then(Commands.literal("hard_kill").executes(ctx -> run(ctx.getSource(), Mode.HARD_KILL)))
+                                .then(Commands.literal("testall").executes(ctx -> NullDamageTestAll.testAll(ctx.getSource())))
+                        )
+        );
 
-        )
-
-
+        dispatcher.register(
+                Commands.literal("dsnnull")
+                        .then(Commands.literal("notify")
+                                .requires(src -> src.hasPermission(2))
+                                .then(Commands.literal("on").executes(ctx -> set(ctx.getSource(), true)))
+                                .then(Commands.literal("off").executes(ctx -> set(ctx.getSource(), false)))
+                                .then(Commands.literal("status").executes(ctx -> status(ctx.getSource())))
+                        )
         );
     }
 
     // ===== core =====
 
-    private enum Mode { HURT, KILL, HARD_KILL }
+    private enum Mode { HURT, KILL }
 
     private static int run(CommandSourceStack src, Mode mode) {
         if (!(src.getEntity() instanceof ServerPlayer player)) return 0;
@@ -62,13 +83,28 @@ public final class NullDamageSourceCommand {
         }
 
         if (mode == Mode.HURT) {
-            target.hurt(null, 4.0F); // 刻意傳 null
+            THE_LIVING_TO_HURT = target;
+            HARD_HURT_SWITCH = true;
         } else if(mode == Mode.KILL) {
-            target.die(null); // 刻意傳 null
-            if(!(target instanceof Player)) target.discard();
-        } else {
-            target.getPersistentData().putBoolean("to_die", true);
+            THE_LIVING_TO_DIE = target;
+            HARD_KILL_SWITCH = true;
         }
+
+        String modeText = (mode == Mode.HURT) ? "HURT" : "KILL";
+        src.sendSystemMessage(
+                Component.literal("[DSN DEBUG] Simulating a null DamageSource " + modeText + " call to mimic a mod bug.")
+                        .withStyle(ChatFormatting.DARK_AQUA)
+        );
+
+        src.sendSystemMessage(
+                Component.literal("[DSN DEBUG] If the guard is working, you should find this in latest.log: suspect=com.vomiter.damagesourceisnotnull.debug.NullDamageSourceCommand")
+                        .withStyle(ChatFormatting.YELLOW)
+        );
+
+        src.sendSystemMessage(
+                Component.literal("[DSN DEBUG] You can also use /dsnnull notify on to receive in-game notifications when the guard intercepts a null DamageSource.")
+                        .withStyle(ChatFormatting.GRAY)
+        );
 
         return 1;
     }
@@ -104,5 +140,19 @@ public final class NullDamageSourceCommand {
 
         level.addFreshEntity(pig);
         return pig;
+    }
+
+    private static int set(CommandSourceStack src, boolean enabled) {
+        DamageSourceGuard.setIngameNotifyEnabled(enabled);
+        src.sendSystemMessage(Component.literal("[DSN] In-game notify: " + (enabled ? "ON" : "OFF"))
+                .withStyle(enabled ? ChatFormatting.GREEN : ChatFormatting.RED));
+        return 1;
+    }
+
+    private static int status(CommandSourceStack src) {
+        boolean enabled = DamageSourceGuard.isIngameNotifyEnabled();
+        src.sendSystemMessage(Component.literal("[DSN] In-game notify is " + (enabled ? "ON" : "OFF"))
+                .withStyle(enabled ? ChatFormatting.GREEN : ChatFormatting.RED));
+        return 1;
     }
 }
