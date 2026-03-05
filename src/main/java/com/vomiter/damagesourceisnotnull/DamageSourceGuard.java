@@ -69,6 +69,7 @@ public final class DamageSourceGuard {
 
         String suspectClass = suspect.split("#", 2)[0];
         String mod = ModIdResolver.resolveModFromClassName(suspectClass);
+        if(suspectClass.startsWith("com.vomiter.damagesourceisnotnull.DamageSourceIsNotNull")) return;
 
         LOGGER.error("[DamageSourceGuard] null DamageSource in {}", phase);
         LOGGER.error("[DamageSourceGuard] entity={}", selfInfo);

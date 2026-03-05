@@ -1,5 +1,6 @@
 package com.vomiter.damagesourceisnotnull.debug;
 
+import com.vomiter.damagesourceisnotnull.DamageSourceIsNotNull;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
@@ -84,7 +85,7 @@ public class NullDamageTestAll {
 
                 // 可選：有些 entity 在未加入世界時行為可能不同；加入世界更接近「真實 tick 中」狀態
                 // 但這也可能帶來副作用（AI/事件）。你要更“真實”就保留 add；要更“乾淨”就註解掉。
-                TESTALL.level.addFreshEntity(living);
+                //TESTALL.level.addFreshEntity(living);
 
                 // 核心：用 null DamageSource 觸發各家 override hurt/die 的地雷
                 if(living instanceof IEntityToDieWithoutLoot dieWithoutLoot) dieWithoutLoot.setToDieWithoutLoot(true);
@@ -92,9 +93,9 @@ public class NullDamageTestAll {
                 living.die(null);
             } catch (Throwable t) {
                 TESTALL.failures.put(key, e.getClass());
-
+                DamageSourceIsNotNull.LOGGER.error("[DamageSourceTestAll] {} ({}) is vulnerable.", key, e.getClass());
             }
-            if(e.isAlive()) e.discard();
+            if(e.isAddedToWorld()) e.discard();
 
         }
 
@@ -145,7 +146,7 @@ public class NullDamageTestAll {
 
         if (failures == 0) return;
 
-        player.sendSystemMessage(Component.literal("[DSN TESTALL] Problematic EntityTypes (first " + TESTALL_MAX_LINES + "):")
+        player.sendSystemMessage(Component.literal("[DSN TESTALL] Vulnerable EntityTypes (first " + TESTALL_MAX_LINES + "):")
                 .withStyle(ChatFormatting.RED));
 
         int shown = 0;

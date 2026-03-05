@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
-@Mixin(Entity.class)
+@Mixin(value = Entity.class, priority = 10000)
 public abstract class EntityMixin {
 
     @ModifyVariable(method = "isInvulnerableTo", at = @At("HEAD"), argsOnly = true)

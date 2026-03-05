@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 
-@Mixin(LivingEntity.class)
+@Mixin(value = LivingEntity.class, priority = 10000)
 public abstract class LivingEntityMixin extends Entity implements IEntityToDieWithoutLoot {
     public LivingEntityMixin(EntityType<?> p_19870_, Level p_19871_) {
         super(p_19870_, p_19871_);
