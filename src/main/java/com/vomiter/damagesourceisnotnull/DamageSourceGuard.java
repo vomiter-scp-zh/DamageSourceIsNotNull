@@ -1,6 +1,7 @@
 package com.vomiter.damagesourceisnotnull;
 
 import com.mojang.logging.LogUtils;
+import com.vomiter.damagesourceisnotnull.debug.NullDamageTestAll;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
@@ -69,7 +70,7 @@ public final class DamageSourceGuard {
 
         String suspectClass = suspect.split("#", 2)[0];
         String mod = ModIdResolver.resolveModFromClassName(suspectClass);
-        if(suspectClass.startsWith("com.vomiter.damagesourceisnotnull.DamageSourceIsNotNull")) return;
+        if(NullDamageTestAll.isTestAllRunning()) return;
 
         LOGGER.error("[DamageSourceGuard] null DamageSource in {}", phase);
         LOGGER.error("[DamageSourceGuard] entity={}", selfInfo);
