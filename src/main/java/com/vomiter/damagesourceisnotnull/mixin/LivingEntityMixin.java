@@ -1,5 +1,7 @@
 package com.vomiter.damagesourceisnotnull.mixin;
 
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.vomiter.damagesourceisnotnull.DamageSourceGuard;
 import com.vomiter.damagesourceisnotnull.debug.IEntityToDieWithoutLoot;
 import net.minecraft.world.damagesource.DamageSource;
@@ -11,7 +13,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 
@@ -21,14 +22,17 @@ public abstract class LivingEntityMixin extends Entity implements IEntityToDieWi
         super(p_19870_, p_19871_);
     }
 
-    @ModifyVariable(method = "die", at = @At("HEAD"), argsOnly = true)
-    private DamageSource dsg$guardDieSource(DamageSource source) {
-        return DamageSourceGuard.guard((LivingEntity)(Object)this, "die", source);
+    @WrapMethod(method = "die")
+    private void wrapDie(DamageSource damageSource, Operation<Void> original){
+        if(damageSource == null) damageSource = DamageSourceGuard.guard((LivingEntity)(Object)this, "die", damageSource);
+        original.call(damageSource);
     }
 
-    @ModifyVariable(method = "hurt", at = @At("HEAD"), argsOnly = true)
-    private DamageSource dsg$guardHurtSource(DamageSource source) {
-        return DamageSourceGuard.guard((LivingEntity)(Object)this, "hurt", source);
+    @WrapMethod(method = "hurt")
+    private boolean wrapHurt(DamageSource damageSource, float amount, Operation<Boolean> original){
+        if(damageSource == null) damageSource = DamageSourceGuard.guard((LivingEntity)(Object)this, "die", damageSource);
+        original.call(damageSource, amount);
+        return false;
     }
 
     @Unique private boolean damageSourceIsNotNull$dieWithoutLoot = false;

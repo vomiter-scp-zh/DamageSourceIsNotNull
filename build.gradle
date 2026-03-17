@@ -10,6 +10,7 @@ plugins {
 
 vomiterMod {
     modId = mod_id
+    mixinExtrasVersion = "0.5.3"
     // 需要的話可以關掉某些功能
     // enableMixinExtras = false
     // enableDevJar = false
@@ -56,6 +57,8 @@ dependencies {
     compileOnly fg.deobf("curse.maven:alexs-mobs-426558:5698791")
     runtimeOnly fg.deobf("curse.maven:alexs-mobs-426558:5698791")
     runtimeOnly fg.deobf("curse.maven:citadel-331936:7476570")
+
+    //implementation fg.deobf("curse.maven:majrusz-library-437409:5302100")
 }
 
 //devRuntime.project(":common", true)

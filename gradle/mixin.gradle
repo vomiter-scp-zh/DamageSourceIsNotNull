@@ -5,7 +5,7 @@ mixin {
     debug.verbose = true
     debug.export  = true
 }
-/*
+
 tasks.named('processResources', ProcessResources).configure {
     // 把 annotation processor 產生的 refmap 從 tmp 搬進 resources
     from("$buildDir/tmp/compileJava") {
@@ -14,5 +14,5 @@ tasks.named('processResources', ProcessResources).configure {
     }
 }
 
-
+/*
  */

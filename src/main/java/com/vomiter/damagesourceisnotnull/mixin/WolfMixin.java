@@ -1,5 +1,7 @@
 package com.vomiter.damagesourceisnotnull.mixin;
 
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.vomiter.damagesourceisnotnull.DamageSourceGuard;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
@@ -24,8 +26,10 @@ public abstract class WolfMixin extends Entity {
         return DamageSourceGuard.guard((LivingEntity)(Object)this, "die", source);
     }
 
-    @ModifyVariable(method = "hurt", at = @At("HEAD"), argsOnly = true)
-    private DamageSource dsg$guardHurtSource(DamageSource source) {
-        return DamageSourceGuard.guard((LivingEntity)(Object)this, "hurt", source);
+    @WrapMethod(method = "hurt")
+    private boolean wrapHurt(DamageSource damageSource, float amount, Operation<Boolean> original){
+        if(damageSource == null) damageSource = DamageSourceGuard.guard((LivingEntity)(Object)this, "die", damageSource);
+        original.call(damageSource, amount);
+        return false;
     }
 }
