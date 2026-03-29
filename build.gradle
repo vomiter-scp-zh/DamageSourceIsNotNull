@@ -1,66 +1,50 @@
 plugins {
-    id 'eclipse'
+    id 'java-library'
+    id 'maven-publish'
+    id 'net.neoforged.moddev' version '2.0.120'
     id 'idea'
-    id 'net.minecraftforge.gradle' version '[6.0,6.2)'
-    id 'org.spongepowered.mixin' version '0.7.+'
-    id 'com.vomiter.forge-base' version "0.1.0"
-    id 'com.vomiter.dev-runtime' version "0.1.0"
-    id 'com.vomiter.langmerge' version "0.1.0"
+    id 'com.vomiter.neoforge-base'
 }
 
-vomiterMod {
+vomiterNeoForge {
     modId = mod_id
-    mixinExtrasVersion = "0.5.3"
-    // 需要的話可以關掉某些功能
-    // enableMixinExtras = false
-    // enableDevJar = false
+    // 你不需要改 expandTargets，因為 plugin 預設已對齊 META-INF/neoforge.mods.toml
 }
 
-langMerge { modId = mod_id }
+tasks.named('wrapper', Wrapper).configure {
+    distributionType = Wrapper.DistributionType.BIN
+}
+
 
 version = mod_version
 group = mod_group_id
-base { archivesName = mod_id }
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(17)
-
-minecraft {
-    mappings channel: mapping_channel, version: mapping_version
-    copyIdeResources = true
+base {
+    archivesName = mod_id
 }
 
-apply from: 'gradle/runs.gradle'
-apply from: 'gradle/publishing-local.gradle'
-apply from: 'gradle/mixin.gradle'
+// Mojang ships Java 21 to end users in 1.21.1, so mods should target Java 21.
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
-/*
-repositories {
-    maven {
-        url "https://cursemaven.com"
-        content { includeGroup "curse.maven" }
-    }
-    maven { url "https://maven.blamejared.com" }
-}
- */
-
-//apply from: 'gradle/tfc-dep.gradle'
-//apply from: 'gradle/optional-dep.gradle'
+apply from: 'gradle/neo-forge-runs.gradle'
 
 dependencies {
-    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
-    annotationProcessor("org.spongepowered:mixin:${mixin_version}:processor")
+    compileOnly "curse.maven:quark-243121:7777937"
 
-    compileOnly fg.deobf("curse.maven:quark-243121:6427817")
-    //runtimeOnly fg.deobf("curse.maven:zeta-968868:7335229")
-    //runtimeOnly fg.deobf("curse.maven:quark-243121:6427817")
-
-    compileOnly fg.deobf("curse.maven:alexs-mobs-426558:5698791")
-    runtimeOnly fg.deobf("curse.maven:alexs-mobs-426558:5698791")
-    runtimeOnly fg.deobf("curse.maven:citadel-331936:7476570")
-
-    compileOnly fg.deobf("curse.maven:born-in-chaos-686437:7366478")
-
-    //implementation fg.deobf("curse.maven:majrusz-library-437409:5302100")
+    //compileOnly fg.deobf("curse.maven:alexs-mobs-426558:5698791")
+    compileOnly "curse.maven:born-in-chaos-686437:7366499"
 }
 
-//devRuntime.project(":common", true)
+// Example configuration to allow publishing using the maven-publish plugin
+publishing {
+    publications {
+        register('mavenJava', MavenPublication) {
+            from components.java
+        }
+    }
+    repositories {
+        maven {
+            url "file://${project.projectDir}/repo"
+        }
+    }
+}
