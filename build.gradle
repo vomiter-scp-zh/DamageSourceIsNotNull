@@ -58,6 +58,8 @@ dependencies {
     runtimeOnly fg.deobf("curse.maven:alexs-mobs-426558:5698791")
     runtimeOnly fg.deobf("curse.maven:citadel-331936:7476570")
 
+    compileOnly fg.deobf("curse.maven:born-in-chaos-686437:7366478")
+
     //implementation fg.deobf("curse.maven:majrusz-library-437409:5302100")
 }
 
