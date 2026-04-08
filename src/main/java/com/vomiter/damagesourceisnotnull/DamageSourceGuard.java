@@ -27,7 +27,16 @@ public final class DamageSourceGuard {
         INGAME_NOTIFY = enabled;
     }
 
-    private DamageSourceGuard() {}
+    private DamageSourceGuard() {
+    }
+
+    public static Object guardObject(Object self, String phase, Object source) {
+        if(self instanceof LivingEntity living && source == null) {
+            return guard(living, phase, null);
+        }
+        return source;
+    }
+
 
     /**
      * @param self  目前正在 hurt/die 的 LivingEntity

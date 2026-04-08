@@ -15,7 +15,7 @@ import static net.minecraftforge.common.MinecraftForge.EVENT_BUS;
 @Mod(DamageSourceIsNotNull.MODID)
 public class DamageSourceIsNotNull {
     // Define mod id in a common place for everything to reference
-    public static final String MODID = "damagesourceisnotnull";
+    public static final String MODID = "dsnnullbasic";
     // Directly reference a slf4j logger
     public static final Logger LOGGER = LogUtils.getLogger();
 
