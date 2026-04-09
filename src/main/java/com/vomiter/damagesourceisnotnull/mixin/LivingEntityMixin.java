@@ -30,9 +30,8 @@ public abstract class LivingEntityMixin extends Entity implements IEntityToDieWi
 
     @WrapMethod(method = "hurt")
     private boolean wrapHurt(DamageSource damageSource, float amount, Operation<Boolean> original){
-        if(damageSource == null) damageSource = DamageSourceGuard.guard((LivingEntity)(Object)this, "die", damageSource);
-        original.call(damageSource, amount);
-        return false;
+        if(damageSource == null) damageSource = DamageSourceGuard.guard((LivingEntity)(Object)this, "hurt", damageSource);
+        return original.call(damageSource, amount);
     }
 
     @Unique private boolean damageSourceIsNotNull$dieWithoutLoot = false;
@@ -41,7 +40,7 @@ public abstract class LivingEntityMixin extends Entity implements IEntityToDieWi
         damageSourceIsNotNull$dieWithoutLoot = b;
     }
 
-    @Inject(method = "die", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;dropAllDeathLoot(Lnet/minecraft/world/damagesource/DamageSource;)V"), cancellable = true)
+    @Inject(method = "die", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;dropAllDeathLoot(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/damagesource/DamageSource;)V"), cancellable = true)
     private void dieWithoutLoot(DamageSource p_21014_, CallbackInfo ci){
         if(!damageSourceIsNotNull$dieWithoutLoot) return;
         ci.cancel();

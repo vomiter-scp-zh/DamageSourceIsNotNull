@@ -1,7 +1,9 @@
 package com.vomiter.damagesourceisnotnull;
 
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.forgespi.language.IModInfo;
+
+import net.neoforged.fml.ModList;
+import net.neoforged.fml.loading.moddiscovery.ModFileInfo;
+import net.neoforged.neoforgespi.language.IModInfo;
 
 import java.net.URL;
 import java.net.URLDecoder;
@@ -34,7 +36,7 @@ public final class ModIdResolver {
             Optional<IModInfo> hit = ModList.get().getModFiles().stream()
                     .flatMap(mf -> mf.getMods().stream().map(mi -> new Object[]{ mi, mf }))
                     .filter(arr -> {
-                        var mf = (net.minecraftforge.fml.loading.moddiscovery.ModFileInfo) ((Object[])arr)[1];
+                        var mf = (ModFileInfo) ((Object[])arr)[1];
                         Path p = mf.getFile().getFilePath();
                         if (p == null) return false;
                         String fileName = p.getFileName().toString();

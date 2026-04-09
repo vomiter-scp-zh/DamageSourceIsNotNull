@@ -1,0 +1,40 @@
+{
+  "required": true,
+  "package": "com.vomiter.damagesourceisnotnull.mixin",
+  "refmap": "damagesourceisnotnull.mixins.refmap.json",
+  "plugin": "com.vomiter.damagesourceisnotnull.DSNNullMixinPlugin",
+  "minVersion": "0.8",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+    "AbstractVillagerMixin",
+    "AllayMixin",
+    "ArmorStandMixin",
+    "EnderdragonMixin",
+    "EndermanMixin",
+    "EntityMixin",
+    "FakePlayerMixin",
+    "GhastMixin",
+    "GuardianMixin",
+    "HoglinMixin",
+    "LivingEntityMixin",
+    "PiglinBruteMixin",
+    "PiglinMixin",
+    "PlayerMixin",
+    "RaiderMixin",
+    "ServerPlayerMixin",
+    "ShulkerMixin",
+    "SilverfishMixin",
+    "VillagerMixin",
+    "WardenMixin",
+    "WitherBossMixin",
+    "WolfMixin",
+    "ZoglinMixin",
+    "ZombieMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
+  }
+}
