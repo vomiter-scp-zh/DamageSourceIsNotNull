@@ -22,16 +22,14 @@ public abstract class EnderdragonMixin extends Entity {
 
     @WrapMethod(method = "hurt(Lnet/minecraft/world/damagesource/DamageSource;F)Z")
     private boolean wrapHurt(DamageSource damageSource, float amount, Operation<Boolean> original){
-        if(damageSource == null) damageSource = DamageSourceGuard.guard((LivingEntity)(Object)this, "die", damageSource);
-        original.call(damageSource, amount);
-        return false;
+        if(damageSource == null) damageSource = DamageSourceGuard.guard((LivingEntity)(Object)this, "hurt", damageSource);
+        return original.call(damageSource, amount);
     }
 
     @WrapMethod(method = "hurt(Lnet/minecraft/world/entity/boss/EnderDragonPart;Lnet/minecraft/world/damagesource/DamageSource;F)Z")
-    private boolean wrapHurt2(EnderDragonPart part, DamageSource damageSource, float amount, Operation<Boolean> original){
-        if(damageSource == null) damageSource = DamageSourceGuard.guard((LivingEntity)(Object)this, "die", damageSource);
-        original.call(part, damageSource, amount);
-        return false;
+    private boolean wrapHurt(EnderDragonPart part, DamageSource damageSource, float amount, Operation<Boolean> original){
+        if(damageSource == null) damageSource = DamageSourceGuard.guard((LivingEntity)(Object)this, "hurt", damageSource);
+        return original.call(part, damageSource, amount);
     }
 
 }

@@ -27,8 +27,7 @@ public abstract class ServerPlayerMixin extends Entity {
 
     @WrapMethod(method = "hurt")
     private boolean wrapHurt(DamageSource damageSource, float amount, Operation<Boolean> original){
-        if(damageSource == null) damageSource = DamageSourceGuard.guard((LivingEntity)(Object)this, "die", damageSource);
-        original.call(damageSource, amount);
-        return false;
+        if(damageSource == null) damageSource = DamageSourceGuard.guard((LivingEntity)(Object)this, "hurt", damageSource);
+        return original.call(damageSource, amount);
     }
 }
