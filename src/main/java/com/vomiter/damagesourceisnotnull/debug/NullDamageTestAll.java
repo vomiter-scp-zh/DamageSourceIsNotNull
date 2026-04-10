@@ -3,7 +3,6 @@ package com.vomiter.damagesourceisnotnull.debug;
 import com.vomiter.damagesourceisnotnull.DamageSourceIsNotNull;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -12,7 +11,8 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.event.tick.ServerTickEvent;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -94,11 +94,12 @@ public final class NullDamageTestAll {
             this.owner = player.getUUID();
             this.level = player.serverLevel();
             this.testPos = player.position().add(player.getLookAngle().scale(2.0)).add(0, -30, 0);
-            this.it = BuiltInRegistries.ENTITY_TYPE.iterator();
+            this.it = ForgeRegistries.ENTITY_TYPES.getValues().iterator();
         }
     }
 
-    public static void onServerTick(ServerTickEvent.Post event) {
+    public static void onServerTick(TickEvent.ServerTickEvent event) {
+        if (event.phase != TickEvent.Phase.END) return;
         if (TESTALL == null) return;
 
         ServerPlayer player = TESTALL.level.getServer().getPlayerList().getPlayer(TESTALL.owner);
@@ -112,7 +113,7 @@ public final class NullDamageTestAll {
             EntityType<?> type = TESTALL.it.next();
             processedThisTick++;
 
-            ResourceLocation key = BuiltInRegistries.ENTITY_TYPE.getKey(type);
+            ResourceLocation key = ForgeRegistries.ENTITY_TYPES.getKey(type);
             if (key == null) {
                 continue;
             }
@@ -186,7 +187,7 @@ public final class NullDamageTestAll {
             markFailure(s, key, info, FailStage.DIE, t);
         }
 
-        if (e.isAddedToLevel()) {
+        if (e.isAddedToWorld()) {
             e.discard();
         }
 

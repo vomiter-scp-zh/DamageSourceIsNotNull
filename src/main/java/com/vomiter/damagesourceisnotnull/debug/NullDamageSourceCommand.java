@@ -13,8 +13,8 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.animal.Pig;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.event.RegisterCommandsEvent;
-import net.neoforged.neoforge.event.tick.EntityTickEvent;
+import net.minecraftforge.event.RegisterCommandsEvent;
+import net.minecraftforge.event.entity.living.LivingEvent;
 
 import java.util.Comparator;
 import java.util.List;
@@ -27,8 +27,9 @@ public final class NullDamageSourceCommand {
     private static LivingEntity THE_LIVING_TO_HURT;
     private static boolean HARD_HURT_SWITCH = false;
 
-    public static void onLiving(EntityTickEvent.Post event){
-        if(!(event.getEntity() instanceof LivingEntity living)) return;
+    // 你原本的 tick-scheduled hurt/kill
+    public static void onLiving(LivingEvent.LivingTickEvent event){
+        var living = event.getEntity();
         if (HARD_KILL_SWITCH) {
             if (living.equals(THE_LIVING_TO_DIE)) {
                 living.die(null);
