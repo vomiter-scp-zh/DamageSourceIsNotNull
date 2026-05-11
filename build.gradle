@@ -49,23 +49,6 @@ repositories {
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
     annotationProcessor("org.spongepowered:mixin:${mixin_version}:processor")
-
-    compileOnly fg.deobf("curse.maven:quark-243121:6427817")
-    //runtimeOnly fg.deobf("curse.maven:zeta-968868:7335229")
-    //runtimeOnly fg.deobf("curse.maven:quark-243121:6427817")
-
-    compileOnly fg.deobf("curse.maven:alexs-mobs-426558:5698791")
-    runtimeOnly fg.deobf("curse.maven:alexs-mobs-426558:5698791")
-    runtimeOnly fg.deobf("curse.maven:citadel-331936:7476570")
-
-    compileOnly fg.deobf("curse.maven:born-in-chaos-686437:7366478")
-    compileOnly fg.deobf("curse.maven:aether-255308:6134920")
-    compileOnly fg.deobf("curse.maven:irons-spells-n-spellbooks-855414:7822862")
-    compileOnly fg.deobf("curse.maven:bossesrise-1314084:7009368")
-    //compileOnly fg.deobf("curse.maven:bossesrise-1314084:7822332")
-    compileOnly fg.deobf("curse.maven:lendercataclysm-551586:7867528")
-
-    //implementation fg.deobf("curse.maven:majrusz-library-437409:5302100")
 }
 
 //devRuntime.project(":common", true)
