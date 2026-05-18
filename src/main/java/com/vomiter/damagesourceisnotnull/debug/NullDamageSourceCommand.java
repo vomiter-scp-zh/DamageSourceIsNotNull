@@ -49,6 +49,7 @@ public final class NullDamageSourceCommand {
         dispatcher.register(
                 Commands.literal("dsnnull")
                         .then(Commands.literal("debug")
+                                .requires(src -> src.hasPermission(2))
                                 .then(Commands.literal("hurt").executes(ctx -> run(ctx.getSource(), Mode.HURT)))
                                 .then(Commands.literal("kill").executes(ctx -> run(ctx.getSource(), Mode.KILL)))
                                 .then(Commands.literal("testall").executes(ctx -> NullDamageTestAll.testAll(ctx.getSource())))

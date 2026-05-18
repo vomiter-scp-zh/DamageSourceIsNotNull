@@ -2,7 +2,7 @@ package com.vomiter.damagesourceisnotnull;
 
 
 import net.neoforged.fml.ModList;
-import net.neoforged.fml.loading.moddiscovery.ModFileInfo;
+import net.neoforged.neoforgespi.language.IModFileInfo;
 import net.neoforged.neoforgespi.language.IModInfo;
 
 import java.net.URL;
@@ -34,19 +34,19 @@ public final class ModIdResolver {
 
             // 3) 用 jarName 去 ModList 比對
             Optional<IModInfo> hit = ModList.get().getModFiles().stream()
-                    .flatMap(mf -> mf.getMods().stream().map(mi -> new Object[]{ mi, mf }))
-                    .filter(arr -> {
-                        var mf = (ModFileInfo) ((Object[])arr)[1];
+                    .flatMap(mf -> mf.getMods().stream().map(mi -> new ModEntry(mi, mf)))
+                    .filter(entry -> {
+                        var mf = entry.modFileInfo;
+                        if(mf == null) return false;
                         Path p = mf.getFile().getFilePath();
                         if (p == null) return false;
                         String fileName = p.getFileName().toString();
                         return fileName.equalsIgnoreCase(jarName);
                     })
-                    .map(arr -> (IModInfo) ((Object[])arr)[0])
+                    .map(entry -> entry.modInfo)
                     .findFirst();
 
-            if (hit.isEmpty()) return "<unknown>";
-            return hit.get().getModId() + " (" + hit.get().getDisplayName() + ")";
+            return hit.map(modInfo -> modInfo.getModId() + " (" + modInfo.getDisplayName() + ")").orElse("<unknown>");
         } catch (Throwable t) {
             return "<unknown>";
         }
@@ -66,4 +66,6 @@ public final class ModIdResolver {
 
         return s.substring(slash + 1, jarIdx + 4); // 含 .jar
     }
+
+    record ModEntry(IModInfo modInfo, IModFileInfo modFileInfo){};
 }
